@@ -3,12 +3,13 @@ from utils import mnist_reader
 import argparse
 import logging
 from layers import FullyConnected
-from activation import *
+from activation import relu, softmax
 
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)-15s %(levelname)s: %(message)s')
 LOG = logging.getLogger('mlp-fashion-mnist')
-np.random.seed(1234)
+# np.random.seed(233)
+
 
 def evaluate(inputs, y):
     for layer in FCs:
@@ -18,18 +19,19 @@ def evaluate(inputs, y):
     precision = float(np.mean(outputs == y))
     return precision
 
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="numpy mlp for fasion-mnist.")
     parser.add_argument('--batch-size', dest='batch_size', type=int,
                         default=200, help='batch size for training.')
     parser.add_argument('--epochs', dest='epochs', type=int, default=300,
-                        help='number of epochs to train (default: 25)')
+                        help='number of epochs to train (default: 300)')
     parser.add_argument('--lr', dest='lr', type=float, default=0.1,
                         help='learning rate (default: 0.1)')
     parser.add_argument('--momentum', dest='momentum', type=float,
                         default=0.8, help='learning rate (default:0.8)')
     opts = parser.parse_args()
-    
+
     X_train, y_train = mnist_reader.load_mnist('data/fashion', kind='train')
     X_test, y_test = mnist_reader.load_mnist('data/fashion', kind='t10k')
     X_train = X_train.astype(np.float32) / 255
@@ -37,23 +39,23 @@ if __name__ == "__main__":
     r = np.random.permutation(len(y_train))
     X_train = X_train[r]
     y_train = y_train[r]
-    X_dev = X_train[:10000]
-    y_dev = y_train[:10000]
+    X_dev = X_train[:12000]
+    y_dev = y_train[:12000]
     X_train = X_train[10000:]
     y_train = y_train[10000:]
-    
+
     LOG.info("finish data preprocessing.")
 
     FCs = [FullyConnected(784, 256, opts.batch_size, relu()),
            FullyConnected(256, 128, opts.batch_size, relu()),
            FullyConnected(128, 64, opts.batch_size, relu()),
            FullyConnected(64, 10, opts.batch_size, softmax())]
-    
+
     LOG.info("finish initialization.")
 
     n_samples = len(y_train)
     order = np.arange(n_samples)
-    best_precision , test_precision = 0, 0
+    best_precision, test_precision = 0, 0
     for epochs in range(0, opts.epochs):
         np.random.shuffle(order)
         cost = 0.

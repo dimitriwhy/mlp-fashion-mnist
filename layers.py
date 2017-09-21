@@ -1,10 +1,12 @@
 import numpy as np
-from activation import *
+from activation import relu, softmax
+
 
 class FullyConnected:
     def __init__(self, dim_in, dim_out, batch_size, activation):
-        #initialization according to He et al.(2015)
-        self.W = np.random.randn(dim_in, dim_out).astype(np.float32) * np.sqrt(2.0/(dim_in))
+        # initialization according to He et al.(2015)
+        self.W = np.random.randn(dim_in, dim_out).astype(np.float32) \
+                 * np.sqrt(2.0/(dim_in))
         self.b = np.zeros([dim_out]).astype(np.float32)
         self.batch_size = batch_size
         self.activation = activation
@@ -20,10 +22,11 @@ class FullyConnected:
         return outputs
 
     def backward(self, grad):
-        activ_grad = self.activation.backward(self.outputs, self.outputs_act, grad)
+        activ_grad = self.activation.backward(self.outputs,
+                                              self.outputs_act, grad)
         self.grad_b = np.mean(activ_grad, axis=0)
-        self.grad_W = np.dot(self.inputs.transpose(), activ_grad)/self.batch_size
-        grad_inputs = np.dot(self.W, activ_grad.transpose()).transpose()
+        self.grad_W = np.dot(self.inputs.transpose(),
+                             activ_grad) / len(self.inputs)
         grad_inputs = np.dot(activ_grad, self.W.transpose())
         return grad_inputs
 

@@ -1,5 +1,6 @@
 import numpy as np
 
+
 class relu:
     def __init__(self):
         pass
@@ -20,6 +21,7 @@ class softmax:
         return e_x / e_x.sum(axis=1).reshape(len(e_x), -1)
 
     def backward(self, inputs, outputs, fgrad):
-        grad = -np.array([np.sum(outputs * fgrad, axis=1)]).transpose() * outputs
+        grad = -np.array([np.sum(outputs * fgrad, axis=1)]).transpose() \
+                                                        * outputs
         grad = grad + outputs * fgrad
         return grad
